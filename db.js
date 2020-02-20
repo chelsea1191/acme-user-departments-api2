@@ -19,18 +19,35 @@ const sync = async () => {
       id UUID PRIMARY KEY,
       name VARCHAR NOT NULL,
       CHECK (char_length(name) > 0),
-      department_id UUID REFERENCES departments(id)
+      "departmentId" UUID REFERENCES departments(id)
     );
 `
   await client.query(SQL)
   //remember "departmentId" will need to be in quotes
 }
+
+//DEPARTMENTS
 const readDepartments = async () => {
-  return []
+  const SQL = `
+  SELECT * FROM departments
+  `
+  const response = await client.query(SQL)
+  return response.rows
 }
+
+//USERS
 const readUsers = async () => {
-  return []
+  const SQL = `
+  SELECT * FROM users
+  `
+  const response = await client.query(SQL)
+  return response.rows
 }
+
+const readUser = async department => {
+  const SQL = `SELECT name FROM users WHERE departments.name = ${department}`
+}
+
 module.exports = {
   sync,
   readDepartments,
