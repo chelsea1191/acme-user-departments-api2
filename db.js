@@ -11,16 +11,18 @@ const sync = async () => {
       DROP TABLE IF EXISTS departments;
       CREATE TABLE departments
       (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        id UUID DEFAULT uuid_generate_v4(),
         name VARCHAR NOT NULL,
-        CHECK (char_length(name) > 0)
+        CHECK (char_length(name) > 0),
+        PRIMARY KEY (id)
       );
       CREATE TABLE users
       (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         name VARCHAR NOT NULL,
         CHECK (char_length(name) > 0),
-        FOREIGN KEY 'departmentId' REFERENCES departments(id)
+        departmentID UUID,
+        FOREIGN KEY(departmentID) REFERENCES departments(id)
       );
   `
   await client.query(SQL)
@@ -38,6 +40,8 @@ const readDepartments = async () => {
 
 const createDepartment = async name => {
   const SQL = `
+
+
   INSERT INTO departments (name) VALUES ($1)
   returning *
   `
@@ -55,13 +59,10 @@ const readUsers = async () => {
   return response.rows
 }
 
-const readUser = async department => {
-  const SQL = `SELECT name FROM users WHERE departments.name = ${department}`
-}
-
 const createUser = async (name, departmentId) => {
   const SQL = `
-  INSERT INTO users (name, departmentId) VALUES ($1, $2)
+
+  INSERT INTO users (name, departmentID) VALUES ($1, $2)
   returning *;
   `
   const response = await client.query(SQL, [name, departmentId])
